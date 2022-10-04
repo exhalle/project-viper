@@ -27,11 +27,10 @@ pipeline {
                 }
             }
         }
-        stage("Deploy to test") {
+        stage("Puplish artifact to git") {
             steps {
-                echo "========= Start docker compose ============"
-                dir (/proj-viper)
-                sh 'docker compose up -d'
+                echo "========= START PUBLISH ARTIFACT TO GIT ============"
+                
             }
         }
     }
