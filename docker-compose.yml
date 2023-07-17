@@ -1,10 +1,36 @@
-version: '3.9'
+version: '3.3'
+
+networks:
+  app:
+    driver: bridge
+
+volumes:
+  mysqldata: {}
+
 
 services:
   web_viper:
-    build: ./web/.
+    build: 
+      context: ./
+      dockerfile: ./web/Dockerfile
     ports:
       - 9090:8080
+    networks:
+      - app
 
   mysql_viper:
     build: ./mysql/.
+    volumes:
+      - mysqldata:/var/lib/mysql:rw
+    command: ' mysqld --default-authentication-plugin=mysql_native_password --init-file /docker-entrypoint-initdb.d/init.sql'
+    entrypoint: ["docker-entrypoint.sh"]
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+    expose:
+      - 3306
+    hostname: mysqldb
+    networks:
+      - app

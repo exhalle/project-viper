@@ -1,8 +1,7 @@
 FROM tomcat:9.0
-
-# RUN apt-get update && apt-get upgrade
-
-# WORKDIR /usr/local/tomcat
-COPY MVCAndHibernate.war /usr/local/tomcat/webapps/
-
+# Define WorkDir
+WORKDIR /usr/local/tomcat
+# ADD .war to WorkDir
+ADD --chown=tomcat:tomcat ../artifacts/ROOT.war /usr/local/tomcat/webapps
+# Start Tomcat
 CMD ["catalina.sh","run"]

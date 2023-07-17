@@ -1,10 +1,17 @@
-FROM mysql
+# Use the official MySQL image as the base image
+FROM mysql:8.0.33-debian
 
-ENV MYSQL_ROOT_PASSWORD secretcisco
-ENV MYSQL_USER=viper
-ENV MYSQL_PASSWORD=viper
-ENV MYSQL_DATABASE=db_viper
+ARG MYSQL_HOST
+ARG MYSQL_USER
+ARG MYSQL_PASSWORD
+ARG MYSQL_DATABASE
 
-#RUN echo "create database `db_viper`" | mysql -u root -p${MYSQL_ROOT_PASSWORD}
-#RUN echo "CREATE USER 'viper'@'%' IDENTIFIED BY 'viper' | mysql -u root -p${MYSQL_ROOT_PASSWORD}
-#RUN echo "GRANT ALL PRIVILEGES ON db_viper.* to 'viper'@'%' | mysql -u root -p${MYSQL_ROOT_PASSWORD}
+# Copy the SQL script to the docker-entrypoint-initdb.d directory
+COPY ./initsql/init.sql /docker-entrypoint-initdb.d/
+RUN chmod +rx /docker-entrypoint-initdb.d/init.sql
+# Expose the MySQL port
+EXPOSE 3306
+# Set the default command using ENTRYPOINT
+ENTRYPOINT ["docker-entrypoint.sh"]
+# Append the initialization script as an argument to the ENTRYPOINT command
+CMD ["--init-file", "/docker-entrypoint-initdb.d/init.sql"]

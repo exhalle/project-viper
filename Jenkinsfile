@@ -15,22 +15,31 @@ pipeline {
                 // Run Maven on a Unix agent.
                 sh "mvn -Dmaven.test.failure.ignore=true clean package"
 
-                // To run Maven on a Windows agent, use
-                // bat "mvn -Dmaven.test.failure.ignore=true clean package"
+                
             }
 
             post {
                 // If Maven was able to run the tests, even if some of the test
                 // failed, record the test results and archive the jar file.
                 success {
-                    sh 'cp $WORKSPACE/target/*.war /webapp'
+                    echo " TEST APP IN TOMCAT "
+                    sh 'cp $WORKSPACE/target/*.war /webapp/ROOT.war'
+                    echo " COPY to APP DIR for prod"
+                    sh 'cp $WORKSPACE/target/*.war /$WORKSPACE/artifacts/ROOT.war'
                 }
             }
         }
-        stage("Puplish artifact to git") {
+        stage("Publish artifact") {
             steps {
-                echo "========= START PUBLISH ARTIFACT TO GIT ============"
+                echo "========= START PUBLISH ARTIFACT  ============"
                 
+            }
+        stage(" START Docker compose file ")
+            steps{
+                echo " START Docker compose "
+                echo " need add jenkins user to docker"
+                echo "$pwd"
+                sh 'docker-compose up -d --build'
             }
         }
     }
